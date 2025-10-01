@@ -1,0 +1,16 @@
+{
+  "name": "skynetchat-bypass-webclient",
+  "version": "1.0.0",
+  "description": "A Web client for the skynetchat wrapper, that bypasses some restrictions.",
+  "license": "GPL-3.0",
+  "author": "Nix",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ."
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "socket.io": "^4.8.1"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "skynetchat-wrapper",
+  "version": "1.0.0",
+  "description": "Kek, you need more security honey.",
+  "license": "GPL-3.0",
+  "author": "Nix",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ."
+  }
+}

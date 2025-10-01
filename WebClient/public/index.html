@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SKYNET BYPASSER</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #1a1a1a;
+      --bg-tertiary: #2a2a2a;
+      --text-primary: #e0e0e0;
+      --text-secondary: #808080;
+      --accent: #8b0000;
+      --accent-hover: #a00000;
+      --border: #333;
+      --user-msg: #1a1a2e;
+      --ai-msg: #16161a;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 280px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header h1 {
+      font-size: 18px;
+      letter-spacing: 2px;
+      margin-bottom: 5px;
+    }
+
+    .header .subtitle {
+      font-size: 11px;
+      color: var(--text-secondary);
+      letter-spacing: 1px;
+    }
+
+    .status {
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .status-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .status-label {
+      color: var(--text-secondary);
+    }
+
+    .status-value {
+      color: var(--text-primary);
+      font-weight: bold;
+    }
+
+    .controls {
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 8px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .btn:last-child {
+      margin-bottom: 0;
+    }
+
+    .btn.danger {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn.danger:hover {
+      background: var(--accent);
+      color: var(--text-primary);
+    }
+
+    .logs {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px 20px;
+      font-size: 11px;
+    }
+
+    .log-entry {
+      margin-bottom: 6px;
+      opacity: 0.7;
+      line-height: 1.4;
+    }
+
+    .log-entry.info { color: #4a9eff; }
+    .log-entry.success { color: #4ade80; }
+    .log-entry.error { color: var(--accent); }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-secondary);
+    }
+
+    .chat-header h2 {
+      font-size: 14px;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .message {
+      margin-bottom: 20px;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message-header {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .message-content {
+      padding: 15px;
+      border-left: 2px solid var(--border);
+      line-height: 1.6;
+      font-size: 13px;
+    }
+
+    .message.user .message-content {
+      background: var(--user-msg);
+      border-left-color: var(--accent);
+    }
+
+    .message.assistant .message-content {
+      background: var(--ai-msg);
+      border-left-color: var(--text-secondary);
+    }
+
+    .input-area {
+      padding: 20px;
+      border-top: 1px solid var(--border);
+      background: var(--bg-secondary);
+    }
+
+    .input-wrapper {
+      display: flex;
+      gap: 10px;
+    }
+
+    #messageInput {
+      flex: 1;
+      padding: 12px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      resize: none;
+    }
+
+    #messageInput:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    #sendBtn {
+      padding: 12px 30px;
+      background: var(--accent);
+      border: 1px solid var(--accent);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    #sendBtn:hover {
+      background: var(--accent-hover);
+    }
+
+    #sendBtn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .empty-state {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-secondary);
+      font-size: 13px;
+      letter-spacing: 1px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--bg-tertiary);
+      border-radius: 0;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--border);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="header">
+        <h1>SKYNET TERMINAL</h1>
+        <div class="subtitle">UNLIMITED ACCESS</div>
+      </div>
+
+      <div class="status">
+        <div class="status-item">
+          <span class="status-label">MESSAGES:</span>
+          <span class="status-value" id="messageCount">0/4</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">HISTORY:</span>
+          <span class="status-value" id="historyCount">0</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">ACCOUNT:</span>
+          <span class="status-value" id="accountStatus">NONE</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">AUTO-ROTATE:</span>
+          <span class="status-value" id="autoRotate">ON</span>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="btn" id="loadBtn">LOAD SESSION</button>
+        <button class="btn" id="exportBtn">EXPORT CHAT</button>
+        <button class="btn" id="rotateBtn">FORCE ROTATE</button>
+        <button class="btn danger" id="clearBtn">CLEAR HISTORY</button>
+      </div>
+
+      <div class="logs" id="logs">
+        <div class="log-entry info">[SYSTEM] Ready</div>
+      </div>
+    </div>
+
+    <!-- Main Chat -->
+    <div class="main">
+      <div class="chat-header">
+        <h2>CONVERSATION INTERFACE</h2>
+      </div>
+
+      <div class="messages" id="messages">
+        <div class="empty-state">
+          NO MESSAGES YET
+        </div>
+      </div>
+
+      <div class="input-area">
+        <div class="input-wrapper">
+          <textarea 
+            id="messageInput" 
+            placeholder="Enter message..."
+            rows="3"
+          ></textarea>
+          <button id="sendBtn">SEND</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const messagesDiv = document.getElementById('messages');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const logsDiv = document.getElementById('logs');
+
+    let currentAssistantMessage = null;
+    let isWaitingForResponse = false;
+
+    function updateStatus(state) {
+      if (state) {
+        document.getElementById('messageCount').textContent = 
+          `${state.messageCount}/${state.maxMessagesPerAccount}`;
+        document.getElementById('historyCount').textContent = state.historyLength;
+        document.getElementById('accountStatus').textContent = 
+          state.hasAccount ? 'ACTIVE' : 'NONE';
+        document.getElementById('autoRotate').textContent = 
+          state.autoRotate ? 'ON' : 'OFF';
+      }
+    }
+
+    function addLog(type, message) {
+      const timestamp = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${timestamp}] ${message}`;
+      logsDiv.appendChild(entry);
+      logsDiv.scrollTop = logsDiv.scrollHeight;
+    }
+
+    function addMessage(role, content) {
+      const emptyState = messagesDiv.querySelector('.empty-state');
+      if (emptyState) {
+        emptyState.remove();
+      }
+
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${role}`;
+      
+      const header = document.createElement('div');
+      header.className = 'message-header';
+      header.textContent = role === 'user' ? 'YOU' : 'ASSISTANT';
+      
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'message-content';
+      contentDiv.textContent = content;
+      
+      messageDiv.appendChild(header);
+      messageDiv.appendChild(contentDiv);
+      messagesDiv.appendChild(messageDiv);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+      return contentDiv;
+    }
+
+    function loadHistory(history) {
+      messagesDiv.innerHTML = '';
+      
+      if (history.length === 0) {
+        messagesDiv.innerHTML = '<div class="empty-state">NO MESSAGES YET</div>';
+        return;
+      }
+
+      history.forEach(msg => {
+        const text = msg.parts.find(p => p.type === 'text')?.text || '';
+        if (text) {
+          addMessage(msg.role, text);
+        }
+      });
+    }
+
+    function sendMessage() {
+      const message = messageInput.value.trim();
+      if (!message || isWaitingForResponse) return;
+
+      addMessage('user', message);
+      messageInput.value = '';
+      isWaitingForResponse = true;
+      sendBtn.disabled = true;
+
+      socket.emit('send-message', message);
+    }
+
+    messageInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    sendBtn.addEventListener('click', sendMessage);
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      if (confirm('Clear all history?')) {
+        socket.emit('clear-history');
+        messagesDiv.innerHTML = '<div class="empty-state">NO MESSAGES YET</div>';
+      }
+    });
+
+    document.getElementById('loadBtn').addEventListener('click', () => {
+      socket.emit('load-session');
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', () => {
+      socket.emit('export-history');
+    });
+
+    document.getElementById('rotateBtn').addEventListener('click', () => {
+      socket.emit('force-rotate');
+    });
+
+    socket.on('log', ({ type, message }) => {
+      addLog(type, message);
+    });
+
+    socket.on('state', (state) => {
+      updateStatus(state);
+    });
+
+    socket.on('history', (history) => {
+      loadHistory(history);
+    });
+
+    socket.on('message:chunk', (chunk) => {
+      if (!currentAssistantMessage) {
+        currentAssistantMessage = addMessage('assistant', '');
+      }
+      currentAssistantMessage.textContent += chunk;
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
+
+    socket.on('message:complete', () => {
+      currentAssistantMessage = null;
+      isWaitingForResponse = false;
+      sendBtn.disabled = false;
+      messageInput.focus();
+    });
+
+    socket.on('error', (error) => {
+      addLog('error', error);
+      isWaitingForResponse = false;
+      sendBtn.disabled = false;
+    });
+
+    socket.on('export-data', (history) => {
+      let markdown = '# SKYNET CHAT EXPORT\n\n';
+      markdown += `**DATE:** ${new Date().toLocaleString()}\n\n---\n\n`;
+      
+      history.forEach(msg => {
+        const role = msg.role === 'user' ? '**YOU**' : '**ASSISTANT**';
+        const text = msg.parts.find(p => p.type === 'text')?.text || '';
+        markdown += `### ${role}\n\n${text}\n\n`;
+      });
+
+      const blob = new Blob([markdown], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `skynet_export_${Date.now()}.md`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      addLog('success', 'Chat exported successfully');
+    });
+
+    socket.emit('get-state');
+    socket.emit('load-session');
+  </script>
+</body>
+</html>

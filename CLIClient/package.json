@@ -1,0 +1,12 @@
+{
+  "name": "skynetchat-bypass-client",
+  "version": "1.0.0",
+  "description": "A simple CLI client for the skynetchat wrapper, that bypasses some restrictions.",
+  "license": "GPL-3.0",
+  "author": "Nix",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ."
+  }
+}
