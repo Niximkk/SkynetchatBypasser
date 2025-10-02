@@ -24,7 +24,9 @@ function getSession(sessionId) {
   if (!sessions.has(sessionId)) {
     const chat = new SkynetChatWrapper({
       maxMessagesPerAccount: 5,
-      autoRotate: true
+      autoRotate: true,
+      proxyFile: 'proxies.txt',
+      autoLoadProxies: true
     });
     
     sessions.set(sessionId, {
@@ -95,6 +97,26 @@ io.on('connection', (socket) => {
   
   const setupChatListeners = () => {
     chat.removeAllListeners();
+
+    chat.on('proxy:loaded', ({ count }) => {
+      socket.emit('info', { type: 'info', message: `${count} proxies carregados` });
+    });
+
+    chat.on('proxy:switched', ({ index, total, proxy }) => {
+      socket.emit('info', { type: 'warn', message: `Proxy trocado [${index + 1}/${total}]: ${proxy.host}:${proxy.port}` });
+    });
+
+    chat.on('proxy:blacklisted', ({ proxy, reason, totalBlacklisted }) => {
+      socket.emit('log', { type: 'warn', message: `Proxy bloqueado: ${proxy} - Razão: ${reason} (Total bloqueados: ${totalBlacklisted})` });
+    });
+
+    chat.on('proxy:all-blacklisted', ({ total, blacklisted }) => {
+      socket.emit('log', { type: 'warn', message: `Todos os proxies foram bloqueados! (${blacklisted}/${total})` });
+    });
+
+    chat.on('proxy:file-not-found', ({ path }) => {
+      socket.emit('log', { type: 'error', message: `Arquivo de proxies não encontrado: ${path}` });
+    });
     
     chat.on('account:creating', () => {
       socket.emit('log', { type: 'info', message: 'Creating new account...' });

@@ -7,7 +7,9 @@ class SkynetClient {
   constructor() {
     this.chat = new SkynetChatWrapper({
       maxMessagesPerAccount: 5,
-      autoRotate: true
+      autoRotate: true,
+      proxyFile: 'proxies.txt',
+      autoLoadProxies: true
     });
     
     this.rl = readline.createInterface({
@@ -20,6 +22,26 @@ class SkynetClient {
   }
 
   setupEventListeners() {
+    this.chat.on('proxy:loaded', ({ count }) => {
+      console.log(`${count} proxies carregados`);
+    });
+
+    this.chat.on('proxy:switched', ({ index, total, proxy }) => {
+      console.log(`Proxy trocado [${index + 1}/${total}]: ${proxy.host}:${proxy.port}`);
+    });
+
+    this.chat.on('proxy:blacklisted', ({ proxy, reason, totalBlacklisted }) => {
+      console.log(`Proxy bloqueado: ${proxy} - Razão: ${reason} (Total bloqueados: ${totalBlacklisted})`);
+    });
+
+    this.chat.on('proxy:all-blacklisted', ({ total, blacklisted }) => {
+      console.log(`Todos os proxies foram bloqueados! (${blacklisted}/${total})`);
+    });
+
+    this.chat.on('proxy:file-not-found', ({ path }) => {
+      console.log(`Arquivo de proxies não encontrado: ${path}`);
+    });
+
     this.chat.on('account:creating', () => {
       console.log('Criando nova conta...');
     });
@@ -30,6 +52,7 @@ class SkynetClient {
 
     this.chat.on('account:created', (account) => {
       console.log('Conta criada com sucesso!');
+      console.log(`Proxy usado: ${account.proxy ? `${account.proxy.host}:${account.proxy.port}` : 'Nenhum'}`);
     });
 
     this.chat.on('account:rotating', ({ messageCount }) => {
